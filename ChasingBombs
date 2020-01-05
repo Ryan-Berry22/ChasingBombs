@@ -1,0 +1,217 @@
+# ChasingBombs
+
+import java.awt.*;
+import java.awt.Color;
+import javax.swing.*;
+import javax.swing.JPanel.*;
+import java.awt.event.*;
+import java.util.List;
+import java.util.Random;
+/**
+ * A game called chasing-bombs where the player has to click a square and hope that they
+ * avoid the bomb which is hidden under the square. If a player clicks on a square and there is
+ * no bomb they gain a point. The player will continue to gain points until they click on a
+ * bomb and then the player will lose. Depending on the difficulty chosen to win the game you
+ * will need to collect the amount of points required for the difficulty chosen,
+ *
+ * @author (Ryan Berry)
+ * @version (March 2019)
+ */
+public class ChasingBombs extends JFrame 
+{
+    private final int ROWS = 2;
+    private final int COLS = 5;
+    private final int GAP = 2;
+    private final int NUM = ROWS * COLS;
+    private JPanel pane = new JPanel(new GridLayout(ROWS,COLS, GAP,GAP));
+    private JPanel [] panel = new JPanel[NUM];
+    private JPanel panel2 = new JPanel();
+    private JPanel panel3 = new JPanel();
+    private int points; 
+    private JLabel messages;
+    private JLabel message;
+    private int endGamePoints;
+    private int rand;
+    private boolean gameOver;
+
+    /**
+     * A constructor which sets up the size of my game aswell as making it visible.
+     */
+    public ChasingBombs() 
+    {
+        super("Evade The Bomb");
+        setSize(300,300);
+        makeFrame();
+        setVisible(true);
+    }
+
+    /**
+     * A method which sets up the layout of my game and adds the relevent panes and buttons 
+     * onto it. This sets up the 10 panels to allow the user to click on the panels they want to
+     * play the game, if the player clicks a panel without a bomb in it the panel will change
+     * colour and they will gain a point. This method also sets up buttons which allows the 
+     * user to select the difficulty they wish to play on. Also this method set up a button 
+     * called exit which allows the user to exit the game and it also set up a play button 
+     * which allows the user to reset the game when they wish. This method also sets an
+     * appropriate message depending on what part or what button the user click during the game.
+     * Also once the user has won the game the game will stop and not allow the user to carry 
+     * on, until they click play again.
+     */
+    public void makeFrame() 
+    {
+        Container contentPane = getContentPane(); //Sets up the layout.
+        contentPane.setLayout(new GridLayout()); //Sets up the content pane.
+
+        add(pane);
+        add(panel2);
+        add(panel3);//Adds the panels to the interface.
+
+        JButton button1 = new JButton("Play A Game");
+        JButton button2 = new JButton("Exit");
+        JButton button3 = new JButton("Easy");
+        JButton button4 = new JButton("Intermediate");
+        JButton button5 = new JButton("Difficult"); //Sets up the buttons for the interface.
+
+        messages = new JLabel("");
+        message = new JLabel(""); 
+
+        endGamePoints = 5;//Starts the game off with endGamePoints starting at 5.
+        messages.setText("Click 5 safe panels to win!");//Starts the game with the textClick 5 safe panels to win! being displayed.
+
+        rand = (int)(Math.random() * 10); //sets a random number.
+        gameOver = false; //sets the gameOver to false.
+
+        for(int x = 0; x < 10; x++) { 
+            panel[x] = new JPanel();      
+            panel[x].setBackground(Color.RED);
+            pane.add(panel[x]);
+            panel[x].addMouseListener(new MouseAdapter() {   
+                    /**
+                     * This method sets up my panels to increment the points if the panel does
+                     * have a bomb. It also ends the game if the person has landed on a bomb or 
+                     * collected the amount of points required.
+                     * @param MouseEvent e a parameter to use mousePressed method.
+                     */
+                    public void mousePressed(MouseEvent e) {
+                        Object source = e.getSource();
+                        JPanel panelG = (JPanel) source;                        
+                        if(gameOver == false && panelG.getBackground() != Color.YELLOW) {
+                            if(endGamePoints == 0) {
+                                gameOver = true;
+                                panelG.setBackground(Color.RED);
+                                message.setText("You hit a bomb, you lose! you got" + " " + points + " " + "points");
+                            } else {                             
+                                panelG.setBackground(Color.YELLOW); 
+                            }
+                            if(panelG.getBackground() == Color.YELLOW) {                                
+                                if(panelG != panel[rand]) {
+                                    points++;
+                                }
+                                if(panelG.equals(panel[rand])) {
+                                    panelG.setBackground(Color.RED);
+                                    gameOver = true;
+                                    message.setText("You hit a bomb, you lose! you got" + " " + points + " " + "points");
+                                }
+                                if(points == 5 && points == endGamePoints) {  
+                                    gameOver = true;
+                                    message.setText("You win! You got 5 points"); 
+                                }
+                                if(points == 7 && points == endGamePoints) {
+                                    gameOver = true;
+                                    message.setText("You win! You got 7 points");
+                                }  
+                            }
+                        }
+                        button1.addActionListener(new ActionListener() {
+                                /**
+                                 * This method resets the game back to the start once clicked.
+                                 * @param ActionEvent e sets up the actionPerformed method.
+                                 */
+                                public void actionPerformed (ActionEvent e) {    
+                                    gameOver = false;
+                                    rand = (int)(Math.random() * 10);
+                                    panelG.setBackground(Color.RED);
+                                    points = 0;
+                                    message.setText(" ");
+                                }
+                            });
+                    }
+                });
+        }
+
+        panel3.add(messages);
+        panel2.add(message);
+        panel2.add(button1);
+        panel2.add(button2);
+        panel3.add(button3);
+        panel3.add(button4);
+        panel3.add(button5);
+        panel2.setBackground(Color.MAGENTA);
+        panel3.setBackground(Color.GREEN); //adds all the neccessary buttons, messages and colours to their panels
+
+        button1.addActionListener(new ActionListener() {
+                /**
+                 * This method resets the game back to the start once clicked.
+                 * @param ActionEvent e sets up the actionPerformed method.
+                 */
+                public void actionPerformed (ActionEvent e) {   
+                    for(int x = 0; x < 10; x++) {
+                        panel[x].setBackground(Color.RED);
+                    }
+                    gameOver = false;
+                    rand = (int)(Math.random() * 10);
+                    points = 0;
+                    message.setText(" ");
+                }
+            });
+
+        button2.addActionListener(source -> System.exit(0)); //Allows the user to exit the game when they click exit.
+
+        button3.addActionListener(new ActionListener() {
+                /**
+                 * This sets up the 'Easy' difficulty which lets the user win in 5 points if they dont hit the bomb. Allows the user to reset if the switch between difficulties.
+                 * @param ActionEvent e sets up the actionPerformed method.
+                 */
+                public void actionPerformed (ActionEvent e) {  
+                    for(int x = 0; x < 10; x++) {
+                        panel[x].setBackground(Color.RED);
+                    }
+                    endGamePoints = 5;
+                    rand = (int)(Math.random() * 10);
+                    points = 0;
+                    messages.setText("Click 5 safe panels to win!");
+                }
+            });
+
+        button4.addActionListener(new ActionListener() {
+                /**
+                 * This sets up the 'Intermediate' difficulty which lets the user win in 7 points if they dont hit the bomb. Allows the user to reset if the switch between difficulties.
+                 * @param ActionEvent e sets up the actionPerformed method.
+                 */
+                public void actionPerformed (ActionEvent e) {
+                    for(int x = 0; x < 10; x++) {
+                        panel[x].setBackground(Color.RED);
+                    }
+                    endGamePoints = 7;
+                    rand = (int)(Math.random() * 10);
+                    points = 0;
+                    messages.setText("Click 7 safe panels to win!");
+                }
+            });  
+
+        button5.addActionListener(new ActionListener() {
+                /**
+                 * This sets up the 'Difficult' difficulty which ends the game when the user hits a bomb as no panels are safe. Allows the user to reset if the switch between difficulties.
+                 * @param ActionEvent e sets up the actionPerformed method.
+                 */
+                public void actionPerformed (ActionEvent e) {
+                     for(int x = 0; x < 10; x++) {
+                        panel[x].setBackground(Color.RED);
+                    }
+                    points = 0;
+                    endGamePoints = 0;
+                    messages.setText("There are no safe panels!");
+                }
+            });                   
+    }
+}
